@@ -19,12 +19,7 @@ import Grid from "@mui/material/Grid2";
 import {
     Button,
     Checkbox,
-    Chip,
-    Fab,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
+    Chip
 } from "@mui/material";
 import {
     DashboardOutlined,
@@ -32,51 +27,20 @@ import {
     ReceiptOutlined,
     SubscriptionsOutlined,
     PermIdentityOutlined,
-    AccountBalanceWalletOutlined,
-    CalendarMonthOutlined,
+    AccountBalanceWalletOutlined
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
 const drawerWidth = 240;
 
 const dashboardItem = [
-    ["Dashboard", <DashboardOutlined />],
-    ["Transaction", <ReceiptLongOutlined />],
-    ["Debt", <ReceiptOutlined />],
-    ["Subscription", <SubscriptionsOutlined />],
-    ["Wallet", <AccountBalanceWalletOutlined />],
-    ["Identity", <PermIdentityOutlined />],
+    {id: 1, name: "Dashboard", icon:<DashboardOutlined />},
+    {id: 2, name: "Transaction", icon:<ReceiptLongOutlined />},
+    {id: 3, name: "Debt", icon:<ReceiptOutlined />},
+    {id: 4, name: "Subscription", icon:<SubscriptionsOutlined />},
+    {id: 5, name: "Wallet", icon:<AccountBalanceWalletOutlined />},
+    {id: 6, name: "Identity", icon:<PermIdentityOutlined />},
 ];
-
-interface TransactionDashboard {
-    id: number;
-    issue_date: string;
-    wallet: string;
-    in_out: boolean;
-    amount: number;
-    category: string;
-    status: number;
-}
-
-function createData(
-    id: number,
-    issue_date: string,
-    wallet: string,
-    in_out: boolean,
-    amount: number,
-    category: string,
-    status: number
-): TransactionDashboard {
-    return {
-        id,
-        issue_date,
-        wallet,
-        in_out,
-        amount,
-        category,
-        status,
-    };
-}
 
 function renderStatus(value: number) {
     if (value == 2)
@@ -114,7 +78,7 @@ function renderStatus(value: number) {
 }
 
 function renderDatetime(value: string) {
-    let datetime = DateTime.now().setZone("system")
+    const datetime = DateTime.fromISO(value).setZone("system")
     return datetime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY)
 }
 
@@ -128,21 +92,6 @@ const COLUMN_GRID_SIZE = [
     1, // Status
 ]
 
-// const data = [
-//     createData(1, "10 Oct 22:00", "Momo", true, 10, "Travel", 1),
-//     createData(1, "10 Oct 22:05", "Vietcombank", false, 1000000, "Eating", 2),
-//     createData(1, "10 Oct 22:10", "Vietinbank", true, 50000000, "Shopping", 3),
-//     createData(1, "10 Oct 22:15", "TP Bank", true, 10, "Subscription", 1),
-//     createData(1, "10 Oct 22:20", "Techcombank", false, 15, "Travel", 3),
-//     createData(1, "10 Oct 22:25", "Agribank", true, 18, "Travel", 2),
-//     createData(1, "10 Oct 22:30", "Vietcombank", false, 100, "Other", 2),
-//     createData(1, "10 Oct 22:35", "Vietinbank", true, 20, "Travel", 3),
-//     createData(1, "10 Oct 22:40", "Techcombank", false, 204, "Eating", 1),
-//     createData(1, "10 Oct 22:45", "Agribank", true, 22210, "Travel", 2),
-//     createData(1, "10 Oct 22:50", "Vietcombank", false, 19, "Shopping", 1),
-//     createData(1, "10 Oct 22:55", "Vietcombank", true, 10, "Travel", 3),
-// ];
-
 export default function PermanentDrawerLeft() {
     const rounter = useRouter();
     const [transactions, setTransactions] = useState<TransactionDisplay[]>([])
@@ -150,11 +99,11 @@ export default function PermanentDrawerLeft() {
 
     useEffect(() => {
         getTransactions().then(value => {
-            let transactions: TransactionDisplay[] = []
+            const transactions: TransactionDisplay[] = []
 
-            // @ts-ignore
+            // @ts-expect-error: I know, I know
             value.forEach((element) => {
-                let transaction: TransactionDisplay = {
+                const transaction: TransactionDisplay = {
                     issue_date: renderDatetime(element.issue_date)!,
                     wallet: element.wallet.name,
                     in_out: element.in_out,
@@ -206,9 +155,9 @@ export default function PermanentDrawerLeft() {
                 <List>
                     {dashboardItem.map((item, index) => (
                         <ListItem key={index} disablePadding>
-                            <ListItemButton onClick={(event) => setShow(index)}>
-                                <ListItemIcon>{item[1]}</ListItemIcon>
-                                <ListItemText primary={item[0]} />
+                            <ListItemButton onClick={() => setShow(index)}>
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.name} />
                             </ListItemButton>
                         </ListItem>
                     ))}
