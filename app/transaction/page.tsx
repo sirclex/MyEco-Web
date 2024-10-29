@@ -1,6 +1,6 @@
 "use client";
 
-import {DateTime} from "luxon"
+import { DateTime } from "luxon";
 
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -14,32 +14,31 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useEffect, useState } from "react";
 
-import { getTransactions, TransactionDisplay } from "@/utils/transactionHandler";
-import Grid from "@mui/material/Grid2";
 import {
-    Button,
-    Checkbox,
-    Chip
-} from "@mui/material";
+    getTransactions,
+    TransactionDisplay,
+} from "@/utils/transactionHandler";
+import Grid from "@mui/material/Grid2";
+import { Button, Checkbox, Chip } from "@mui/material";
 import {
     DashboardOutlined,
     ReceiptLongOutlined,
     ReceiptOutlined,
     SubscriptionsOutlined,
     PermIdentityOutlined,
-    AccountBalanceWalletOutlined
+    AccountBalanceWalletOutlined,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 
 const drawerWidth = 240;
 
 const dashboardItem = [
-    {id: 1, name: "Dashboard", icon:<DashboardOutlined />},
-    {id: 2, name: "Transaction", icon:<ReceiptLongOutlined />},
-    {id: 3, name: "Debt", icon:<ReceiptOutlined />},
-    {id: 4, name: "Subscription", icon:<SubscriptionsOutlined />},
-    {id: 5, name: "Wallet", icon:<AccountBalanceWalletOutlined />},
-    {id: 6, name: "Identity", icon:<PermIdentityOutlined />},
+    { id: 1, name: "Dashboard", icon: <DashboardOutlined /> },
+    { id: 2, name: "Transaction", icon: <ReceiptLongOutlined /> },
+    { id: 3, name: "Debt", icon: <ReceiptOutlined /> },
+    { id: 4, name: "Subscription", icon: <SubscriptionsOutlined /> },
+    { id: 5, name: "Wallet", icon: <AccountBalanceWalletOutlined /> },
+    { id: 6, name: "Identity", icon: <PermIdentityOutlined /> },
 ];
 
 function renderStatus(value: number) {
@@ -78,8 +77,8 @@ function renderStatus(value: number) {
 }
 
 function renderDatetime(value: string) {
-    const datetime = DateTime.fromISO(value).setZone("system")
-    return datetime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY)
+    const datetime = DateTime.fromISO(value).setZone("system");
+    return datetime.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY);
 }
 
 const COLUMN_GRID_SIZE = [
@@ -89,17 +88,20 @@ const COLUMN_GRID_SIZE = [
     1.25, // Wallet
     1, // Category
     1, // Subcategory
+    2, // Detail
     1, // Status
-]
+];
 
 export default function PermanentDrawerLeft() {
     const rounter = useRouter();
-    const [transactions, setTransactions] = useState<TransactionDisplay[]>([])
+    const [transactions, setTransactions] = useState<TransactionDisplay[]>([]);
     const [show, setShow] = useState(0);
+    const [transactionDisplay, setTransactionDisplay] =
+        useState<TransactionDisplay>();
 
     useEffect(() => {
-        getTransactions().then(value => {
-            const transactions: TransactionDisplay[] = []
+        getTransactions().then((value) => {
+            const transactionsDisplay: TransactionDisplay[] = [];
 
             // @ts-expect-error: I know, I know
             value.forEach((element) => {
@@ -110,17 +112,23 @@ export default function PermanentDrawerLeft() {
                     amount: element.amount,
                     category: element.category.name,
                     subcategory: element.subcategory.name,
-                    status_id: element.status_id
-                }
-                transactions.push(transaction)
-            })
+                    detail: element.detail,
+                    status_id: element.status_id,
+                };
+                transactionsDisplay.push(transaction);
+            });
 
-            setTransactions(transactions)
+            setTransactions(transactionsDisplay);
+            setTransactionDisplay(transactionsDisplay[0]);
         });
     }, []);
 
     const handleAddTransaction = () => {
         rounter.push("/transaction/create");
+    };
+
+    const handleGridClick = (index:number) => {
+        setTransactionDisplay(transactions[index]);
     };
 
     return (
@@ -238,15 +246,24 @@ export default function PermanentDrawerLeft() {
                                 <Typography>Subcategory</Typography>
                             </Grid>
                             <Grid size={COLUMN_GRID_SIZE[6]}>
-                                <Typography>Status</Typography>
+                                <Typography>Detail</Typography>
                             </Grid>
                             <Grid size={COLUMN_GRID_SIZE[7]}>
+                                <Typography>Status</Typography>
+                            </Grid>
+                            <Grid size={COLUMN_GRID_SIZE[8]}>
                                 <Typography></Typography>
                             </Grid>
                         </Grid>
 
                         {transactions.map((record, index) => (
-                            <Grid container spacing={4} alignItems="center" key={index}>
+                            <Grid
+                                container
+                                spacing={4}
+                                alignItems="center"
+                                key={index}
+                                onClick={() => handleGridClick(index)}
+                            >
                                 <Grid size={COLUMN_GRID_SIZE[0]}>
                                     <Checkbox />
                                 </Grid>
@@ -256,7 +273,10 @@ export default function PermanentDrawerLeft() {
                                 <Grid size={COLUMN_GRID_SIZE[2]}>
                                     <Typography>
                                         {record.in_out == true ? "+ " : "- "}
-                                        {Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(record.amount)}
+                                        {Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(record.amount)}
                                     </Typography>
                                 </Grid>
                                 <Grid size={COLUMN_GRID_SIZE[3]}>
@@ -266,12 +286,19 @@ export default function PermanentDrawerLeft() {
                                     <Typography>{record.category}</Typography>
                                 </Grid>
                                 <Grid size={COLUMN_GRID_SIZE[5]}>
-                                    <Typography>{record.subcategory}</Typography>
+                                    <Typography>
+                                        {record.subcategory}
+                                    </Typography>
                                 </Grid>
                                 <Grid size={COLUMN_GRID_SIZE[6]}>
-                                    {renderStatus(record.status_id)}
+                                    <Typography>
+                                        {record.detail}
+                                    </Typography>
                                 </Grid>
                                 <Grid size={COLUMN_GRID_SIZE[7]}>
+                                    {renderStatus(record.status_id)}
+                                </Grid>
+                                <Grid size={COLUMN_GRID_SIZE[8]}>
                                     <Typography></Typography>
                                 </Grid>
                             </Grid>
