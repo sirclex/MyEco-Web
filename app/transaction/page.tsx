@@ -252,12 +252,11 @@ export default function PermanentDrawerLeft() {
                         <Divider />
 
                         {transactions.map((record, index) => (
-                            <Box>
+                            <Box key={index}>
                                 <Grid
                                     container
                                     spacing={4}
                                     alignItems="center"
-                                    key={index}
                                 >
                                     <Grid size={COLUMN_GRID_SIZE[0]}>
                                         <Checkbox />
