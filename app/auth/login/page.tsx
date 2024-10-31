@@ -1,11 +1,11 @@
 "use client"
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button, TextField, Container, Box, Typography } from '@mui/material';
 
-const LogIn = () => {
+function LogIn() {
   const { data: session } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,4 +57,10 @@ const LogIn = () => {
   );
 };
 
-export default LogIn;
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<Container>Loading...</Container>}>
+      <LogIn/>
+    </Suspense>
+  )
+}
