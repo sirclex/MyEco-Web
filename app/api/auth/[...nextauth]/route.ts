@@ -1,6 +1,10 @@
 import NextAuth, { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import fs from "fs"
+
+interface User {
+    id: string,
+    name: string
+}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -14,7 +18,7 @@ export const authOptions: AuthOptions = {
         if (!credentials) return null
         // Replace this with your own logic to validate credentials
         if (credentials.username === process.env.MYECO_USERNAME && credentials.password === process.env.MYECO_PASSWORD) {
-          return { id: 1, name: 'Sircle' } as any;
+          return { id: "1", name: 'Sircle' } as User;
         } else {
           return null;
         }
